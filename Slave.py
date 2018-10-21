@@ -6,12 +6,19 @@ import sys
 def main(argv):
     try:
         master_hostname = argv[1]
-        master_port = argv[2]
+        master_port = argv[2] # for us this should be 10075
     except:
         print("Invalid arguments."
         sys.exit()
 
     # Send Join Ring Request
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((master_hostname, int(master_port)))
+    
+    request = ''.join(chr(x) for x in [13, 0x4A6F7921])
+    s.sendall(request)
+    
+    response = s.recv(4096)
 
     # Set self as slave node on ring and get ring ID
 
