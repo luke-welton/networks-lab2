@@ -25,8 +25,12 @@ def main(argv):
     magic_number = int(str(response[1] + str(response[2] + str(response[3] + str(response[4])
     thisRID = int(str(response[5])
     nextSlaveIP = int str(response[6] + str(response[7] + str(response[8] + str(response[9]) 
+    nextSlave_pretty = str(response[6] + "." + str(response[7] + "." + str(response[8] + "." + str(response[9]
 
     # Display the GID of master, own ring ID, and the IP address of next slave
+    print("Master GID: ", master_gid)
+    print("My Ring ID: ", thisRID)
+    print("Next Slave: ", nextSlave_pretty
 
     # TODO: Prompt user for a ring ID and message
 
