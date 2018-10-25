@@ -2,13 +2,13 @@ Group 13: Luke Welton, Jesse Roach, Bryant Kelley
 
 # Introduction
 This project implements a ring of communication between a TCP Master and a UDP Slave.
-The Master is written in C++.
-The Slave is written in Python.
+The Master is written in C++, and the Slave is written in Python.
 
 # Functionality
 
 # Compiling
-To compile the Master, you type `g++ Master.cpp -o Master` into a Linux machine with G++.
+To compile the Master, you type `g++ Master.cpp -o Master` into the command line of a Linux machine with G++.
+
 As the Slave is written in Python, a scripting language, no compilation is necessary.
 
 # Executing
