@@ -14,6 +14,24 @@
 #define MASTERRID 0
 #define BACKLOG 10	 // how many pending connections queue will hold
 #define MAXDATASIZE 100
+
+
+/*
+ * Master.cpp
+ * created by Jesse Roach on Oct. 16th 2018
+ * receives join request from slave of form
+ *   1B     4B (Joy!)
+ * | GID | 0x4A6F7921 |
+ * sends response to slave of form
+ *   1B        4B         1B         4B
+ * | GID | 0x4A6F7921 | yourRID | nextSlaveIP |
+ * GID is Group ID
+ * 0x4A6F7921 is the magic number, an ascii phrase
+ * your RID is the slave's assigned Ring ID
+ * nextSlaveIP is the ipaddr of the next slave behind the one currently requesting
+ * Master will not accept requests that are not both 5 bytes and contain the magic number
+ *
+ */
 void displayBuffer(char *Buffer, int length);
 
 void sigchld_handler(int s)
