@@ -235,10 +235,13 @@ void addSlave(unsigned char slaveIP[], int slaveSocketFD) {
     }
 
     //this might need to be changed to UDP
-    write(slaveSocketFD, toSend, sizeof(toSend));
+    if (write(slaveSocketFD, toSend, sizeof(toSend)) != sizeof(toSend)) {
+         printf("An error occurred while sending to the slave.");
+         exit(0);
+    }
+    
 
     nextRID++;
-
 }
 
 unsigned char* getOwnIP() {
