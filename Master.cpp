@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <ifaddrs.h>
 
 #define MASTERRID 0
 #define BACKLOG 10	 // how many pending connections queue will hold
@@ -33,8 +34,8 @@
  */
 void displayBuffer(char *Buffer, int length);
 void initialize();
-void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD);
-char* getThisLinuxMachinesExternalIP();
+void addSlave(unsigned char slaveIP[], int slaveSocketFD);
+unsigned char* getOwnIP();
 
 unsigned char nextSlaveIP[4];
 unsigned char nextRID;
@@ -68,12 +69,6 @@ int main(int argc, char *argv[])
 
     int numbytes;
     char buf[MAXDATASIZE];
-
-    // address of this machine gets stored in myOwnAddrInfo
-    struct sockaddr_in myOwnAddrInfo;
-    char* x = getThisLinuxMachinesExternalIP();
-    printf("Local machine's external IP: %s\n", x);
-    inet_aton(x, &myOwnAddrInfo.sin_addr);
 
     //check for command line args with port number
     if (argc != 2)
@@ -152,6 +147,14 @@ int main(int argc, char *argv[])
                   s, sizeof s);
         printf("server: got connection from %s\n", s);
 
+
+
+        unsigned char slaveIP[4];
+        for (unsigned i = 4; i > 0 i--) {
+            slaveIP[4 - i] = (unsigned char) (their_addr.sin_addr.s_addr >> (8 * (4 - i)));
+        }
+        addSlave(slaveIP, new_fd);
+
         if (!fork()) {
             close(sockfd);
 
@@ -193,11 +196,15 @@ void displayBuffer(char *Buffer, int length){
 }
 
 void initialize() {
-    nextSlaveIP = 0; //change this to localhost
+    unsigned char* ownIP = getOwnIP();
+    for (unsigned i = 0; i < 4; i++) {
+        nextSlaveIP[i] = ownIP[i];
+    }
+
     nextRID = MASTERRID;
 }
 
-void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD) {
+void addSlave(unsigned char slaveIP[], int slaveSocketFD) {
     char toSend[10];
     toSend[0] = 13;
     toSend[1] = 0x4A;
@@ -206,7 +213,7 @@ void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD) {
     toSend[4] = 0x21;
     toSend[5] = nextRID;
 
-    for (unsigned int i = 0; i < 4; i++) {
+    for (unsigned i = 0; i < 4; i++) {
         toSend[6 + i] = nextSlaveIP[i];
         nextSlaveIP[i] = slaveIP[i]; //go ahead & update nextSlaveIP just so we don't have to loop twice
     }
@@ -218,16 +225,20 @@ void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD) {
 
 }
 
-char* getThisLinuxMachinesExternalIP() {
+unsigned char* getOwnIP() {
     struct ifaddrs *ifap, *ifa;
     struct sockaddr_in *sa;
-    char *addr;
+    unsigned char addr[4];
 
-    getifaddrs (&ifap);
+    getifaddrs(&ifap);
     for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
         if (ifa->ifa_addr->sa_family==AF_INET) {
             sa = (struct sockaddr_in *) ifa->ifa_addr;
-            addr = inet_ntoa(sa->sin_addr);
+
+            for (unsigned i = 4; i > 0; i--) {
+                addr[4 - i] = (unsigned char) (sa->sin_addr.s_addr >> (8 * (4 - i)));
+            }
+
             if (strcmp(ifa->ifa_name, "em1") == 0) {
                 break;
             }
@@ -235,5 +246,7 @@ char* getThisLinuxMachinesExternalIP() {
     }
 
     freeifaddrs(ifap);
-    return addr;
+
+    unsigned char *ptr = addr;
+    return ptr;
 }
