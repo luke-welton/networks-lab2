@@ -33,7 +33,8 @@
  */
 void displayBuffer(char *Buffer, int length);
 void initialize();
-void addSlave(int slaveIP, sockaddr_in &slaveSocketFD);
+void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD);
+char* getThisLinuxMachinesExternalIP();
 
 unsigned char nextSlaveIP[4];
 unsigned char nextRID;
@@ -67,6 +68,12 @@ int main(int argc, char *argv[])
 
     int numbytes;
     char buf[MAXDATASIZE];
+
+    // address of this machine gets stored in myOwnAddrInfo
+    struct sockaddr_in myOwnAddrInfo;
+    char* x = getThisLinuxMachinesExternalIP();
+    printf("Local machine's external IP: %s\n", x);
+    inet_aton(x, &myOwnAddrInfo.sin_addr);
 
     //check for command line args with port number
     if (argc != 2)
@@ -209,4 +216,24 @@ void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD) {
 
     nextRID++;
 
+}
+
+char* getThisLinuxMachinesExternalIP() {
+    struct ifaddrs *ifap, *ifa;
+    struct sockaddr_in *sa;
+    char *addr;
+
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr->sa_family==AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            addr = inet_ntoa(sa->sin_addr);
+            if (strcmp(ifa->ifa_name, "em1") == 0) {
+                break;
+            }
+        }
+    }
+
+    freeifaddrs(ifap);
+    return addr;
 }
