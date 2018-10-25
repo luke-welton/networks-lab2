@@ -35,6 +35,7 @@
 void displayBuffer(char *Buffer, int length);
 void initialize();
 void addSlave(int slaveIP, int slaveSocketFD);
+char* getThisLinuxMachinesExternalIP();
 
 int nextSlaveIP;
 unsigned char nextRID;
@@ -218,4 +219,24 @@ void addSlave(int slaveIP, int slaveSocketFD) {
 
     theirRID++;
     nextSlaveIP = slaveIP;
+}
+
+char* getThisLinuxMachinesExternalIP() {
+    struct ifaddrs *ifap, *ifa;
+    struct sockaddr_in *sa;
+    char *addr;
+
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr->sa_family==AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            addr = inet_ntoa(sa->sin_addr);
+            if (strcmp(ifa->ifa_name, "em1") == 0) {
+                break;
+            }
+        }
+    }
+
+    freeifaddrs(ifap);
+    return addr;
 }
