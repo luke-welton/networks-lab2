@@ -54,6 +54,7 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+
 int main(int argc, char *argv[])
 {
     int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
@@ -68,6 +69,12 @@ int main(int argc, char *argv[])
 
     int numbytes;
     char buf[MAXDATASIZE];
+
+    // address of this machine gets stored in myOwnAddrInfo
+    struct sockaddr_in myOwnAddrInfo;
+    char* x = getThisLinuxMachinesExternalIP();
+    printf("Local machine's external IP: %s\n", x);
+    inet_aton(x, &myOwnAddrInfo.sin_addr);
 
     //check for command line args with port number
     if (argc != 2)
