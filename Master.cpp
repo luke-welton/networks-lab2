@@ -217,7 +217,7 @@ void initialize() {
         nextSlaveIP[i] = ownIP[i];
     }
 
-    nextRID = MASTERRID;
+    nextRID = MASTERRID + 1;
 }
 
 void addSlave(unsigned char slaveIP[], int slaveSocketFD) {

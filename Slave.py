@@ -9,6 +9,12 @@ def byte_to_int(byte):
         integer += ord(b)
     return int(integer)
 
+def print_hex(msg):
+    print("Message in hexadecimal:")
+    for i in range(10):
+        print(msg[i].encode('hex'))
+
+
 def main(argv):
     try:
         master_hostname = argv[1]
@@ -26,7 +32,7 @@ def main(argv):
 
     response = s.recv(4096)
 
-    print(response)
+    #    print_hex(response)
     # Set self as slave node on ring and get ring ID
     master_gid = byte_to_int(response[0])
     # magic_number = int(str(response[1]) + str(response[2]) + str(response[3]) + str(response[4]))
@@ -35,9 +41,9 @@ def main(argv):
     nextSlave_pretty = str(byte_to_int(response[6])) + "." + str(byte_to_int(response[7])) + "." + str(byte_to_int(response[8])) + "." + str(byte_to_int(response[9]))
 
     # Display the GID of master, own ring ID, and the IP address of next slave
-    print("Master GID: ", master_gid)
-    print("My Ring ID: ", thisRID)
-    print("Next Slave: ", nextSlave_pretty)
+    print("Master GID: {}".format(master_gid))
+    print("My Ring ID: {}".format(thisRID))
+    print("Next Slave: {}".format(nextSlave_pretty))
 
     # TODO: Prompt user for a ring ID and message
 
