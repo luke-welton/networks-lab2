@@ -188,8 +188,6 @@ void displayBuffer(char *Buffer, int length){
 void initialize() {
     nextSlaveIP = 0; //change this to localhost
     nextRID = MASTERRID;
-    
-    addSlave(
 }
 
 void addSlave(int slaveIP, int slaveSocketFD) {
