@@ -34,7 +34,10 @@
  */
 void displayBuffer(char *Buffer, int length);
 void initialize();
-void addSlave(int theirAddr, int theirRID, int nextSlaveIP);
+void addSlave(int slaveIP, int slaveSocketFD);
+
+int nextSlaveIP;
+unsigned char nextRID;
 
 void sigchld_handler(int s)
 {
@@ -190,18 +193,29 @@ void displayBuffer(char *Buffer, int length){
 }
 
 void initialize() {
-
+    nextSlaveIP = 0; //change this to localhost
+    nextRID = MASTERRID;
 }
 
-void addSlave(int theirAddr, int theirRID, int nextSlaveIP) {
-    /*
-     * Step 1: Send message to new Slave
-     *   The message's format should be:
-     *      1 Byte: Our Group ID
-     *      4 Bytes: 0x4A6F7921 Because Biaz said so
-     *      1 Byte: theirRID
-     *      4 Bytes: nextSlaveIP
-     *
-     * Step 2: Change nextSlaveIP to theirAddr
-     */
+void addSlave(int slaveIP, int slaveSocketFD) {
+    //if (nextSlaveIP != localhost) {
+    //this needs to be changed once we figure out how to get localhost ip
+        char toSend[10];
+        toSend[0] = 13;
+        toSend[1] = 0x4A;
+        toSend[2] = 0x6F;
+        toSend[3] = 0x79;
+        toSend[4] = 0x21;
+        toSend[5] = (char) nextRID;
+
+        //i don't know for sure that this will work, it might need to be changed if nextSlaveIP changes
+        for (unsigned char i = 0; i < 4; i++) {
+            toSend[6 + i] = (char) ((nextSlaveIP >> (8 * (3 - i))) & 0xff);
+        }
+    //}
+
+    write(slaveSocketFD, toSend, sizeof(toSend));
+
+    theirRID++;
+    nextSlaveIP = slaveIP;
 }
