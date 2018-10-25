@@ -13,7 +13,7 @@ As the Slave is written in Python, a scripting language, no compilation is neces
 
 # Executing
 To execute the now-compiled Master, you enter `./Master <port>`, substituting `<port>` with the chosen port number.
-As we are Group 13, we have been using 10023, but many other port numbers will work.
+As we are Group 13, we have been using 10075, but many other port numbers will work.
 
 To execute the Slave, you enter `python Slave.py Master <port>`, substituting `<port>` with the same port number used with the Master.
 
