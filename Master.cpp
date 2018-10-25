@@ -33,6 +33,8 @@
  *
  */
 void displayBuffer(char *Buffer, int length);
+void initialize();
+void addSlave(int theirAddr, int theirRID, int nextSlaveIP);
 
 void sigchld_handler(int s)
 {
@@ -190,6 +192,16 @@ void displayBuffer(char *Buffer, int length){
 void initialize() {
 
 }
-void addSlave(theirAddr) {
 
+void addSlave(int theirAddr, int theirRID, int nextSlaveIP) {
+    /*
+     * Step 1: Send message to new Slave
+     *   The message's format should be:
+     *      1 Byte: Our Group ID
+     *      4 Bytes: 0x4A6F7921 Because Biaz said so
+     *      1 Byte: theirRID
+     *      4 Bytes: nextSlaveIP
+     *
+     * Step 2: Change nextSlaveIP to theirAddr
+     */
 }
