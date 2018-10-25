@@ -158,13 +158,17 @@ int main(int argc, char *argv[])
 
         displayBuffer(message, 5);
         if (message[1] != 0x4A || message[2] != 0x6F || message[3] != 0x79 || message[4] != 0x21) {
-            printf("The connection's message was incorrect or was corrupted.")
+            printf("The connection's message was incorrect or was corrupted.");
         } else {
+            struct sockaddr_in *sockIn = (struct sockaddr_in *) &their_addr;
+
             unsigned char slaveIP[4];
-            for (unsigned i = 4; i > 0 i--) {
-                slaveIP[4 - i] = (unsigned char) (their_addr.sin_addr.s_addr >> (8 * (4 - i)));
+            for (unsigned i = 4; i > 0; i--) {
+                slaveIP[4 - i] = (unsigned char) (sockIn->sin_addr.s_addr >> (8 * (4 - i)));
             }
             addSlave(slaveIP, new_fd);
+
+
         }
 
         if (!fork()) {
