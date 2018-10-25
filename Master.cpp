@@ -15,6 +15,7 @@
 #define MASTERRID 0
 #define BACKLOG 10	 // how many pending connections queue will hold
 #define MAXDATASIZE 100
+#define GROUPID 13
 
 /*
  * Master.cpp
@@ -65,6 +66,7 @@ int main(int argc, char *argv[])
     int yes=1;
 
     char s[INET6_ADDRSTRLEN];
+    char message[5];
     int rv;
 
     int numbytes;
@@ -147,13 +149,23 @@ int main(int argc, char *argv[])
                   s, sizeof s);
         printf("server: got connection from %s\n", s);
 
+        int message_length = recvfrom(new_fd, message, sizeof(message), 0, (struct sockaddr*) &their_addr, &sin_size);
 
-
-        unsigned char slaveIP[4];
-        for (unsigned i = 4; i > 0 i--) {
-            slaveIP[4 - i] = (unsigned char) (their_addr.sin_addr.s_addr >> (8 * (4 - i)));
+        if (message_length == -1) {
+            printf("Something went wrong while receiving a message from the connection.");
+            exit(0);
         }
-        addSlave(slaveIP, new_fd);
+
+        displayBuffer(message, 5);
+        if (message[1] != 0x4A || message[2] != 0x6F || message[3] != 0x79 || message[4] != 0x21) {
+            printf("The connection's message was incorrect or was corrupted.")
+        } else {
+            unsigned char slaveIP[4];
+            for (unsigned i = 4; i > 0 i--) {
+                slaveIP[4 - i] = (unsigned char) (their_addr.sin_addr.s_addr >> (8 * (4 - i)));
+            }
+            addSlave(slaveIP, new_fd);
+        }
 
         if (!fork()) {
             close(sockfd);
@@ -206,7 +218,7 @@ void initialize() {
 
 void addSlave(unsigned char slaveIP[], int slaveSocketFD) {
     char toSend[10];
-    toSend[0] = 13;
+    toSend[0] = GROUPID;
     toSend[1] = 0x4A;
     toSend[2] = 0x6F;
     toSend[3] = 0x79;
