@@ -5,6 +5,7 @@ This project implements a ring of communication between a TCP Master and a UDP S
 The Master is written in C++, and the Slave is written in Python.
 
 # Functionality
+In this lab, a Master is created as a TCP Server, allowing multiple UDP Clients to join as Slaves in a ring formation. In the next lab, they will be able to pass along messages to one another, but currently, they merely exist.
 
 # Compiling
 To compile the Master, you type `g++ Master.cpp -o Master` into the command line of a Linux machine with G++.
