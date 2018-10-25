@@ -33,9 +33,9 @@
  */
 void displayBuffer(char *Buffer, int length);
 void initialize();
-void addSlave(int slaveIP, int slaveSocketFD);
+void addSlave(int slaveIP, sockaddr_in &slaveSocketFD);
 
-int nextSlaveIP;
+unsigned char nextSlaveIP[4];
 unsigned char nextRID;
 
 void sigchld_handler(int s)
@@ -190,7 +190,7 @@ void initialize() {
     nextRID = MASTERRID;
 }
 
-void addSlave(int slaveIP, int slaveSocketFD) {
+void addSlave(unsigned char slaveIP[], sockaddr_in &slaveSocketFD) {
     char toSend[10];
     toSend[0] = 13;
     toSend[1] = 0x4A;
@@ -199,14 +199,14 @@ void addSlave(int slaveIP, int slaveSocketFD) {
     toSend[4] = 0x21;
     toSend[5] = nextRID;
 
-    //i don't know for sure that this will work, it might need to be changed if nextSlaveIP changes format
-    for (unsigned char i = 0; i < 4; i++) {
-        toSend[6 + i] = (char) ((nextSlaveIP >> (8 * (3 - i))) & 0xff);
+    for (unsigned int i = 0; i < 4; i++) {
+        toSend[6 + i] = nextSlaveIP[i];
+        nextSlaveIP[i] = slaveIP[i]; //go ahead & update nextSlaveIP just so we don't have to loop twice
     }
 
     //this might need to be changed to UDP
     write(slaveSocketFD, toSend, sizeof(toSend));
 
     nextRID++;
-    nextSlaveIP = slaveIP;
+
 }
