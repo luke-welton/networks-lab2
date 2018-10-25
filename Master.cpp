@@ -15,7 +15,6 @@
 #define BACKLOG 10	 // how many pending connections queue will hold
 #define MAXDATASIZE 100
 
-
 /*
  * Master.cpp
  * created by Jesse Roach on Oct. 16th 2018
@@ -53,11 +52,6 @@ void *get_in_addr(struct sockaddr *sa)
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
-//
-//typedef struct RingNode
-//{
-//
-//}RingNode;
 
 int main(int argc, char *argv[])
 {
@@ -74,15 +68,14 @@ int main(int argc, char *argv[])
     int numbytes;
     char buf[MAXDATASIZE];
 
-    int nextRID = 1;//this gets passed to slaves and incremented
-    int nextSlaveIP;//this just points to the next ip address in line
-
     //check for command line args with port number
     if (argc != 2)
     {
         fprintf(stderr,"usage: Master MasterPort# \n");
         exit(1);
     }
+    
+    initialize();
 
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
@@ -195,27 +188,27 @@ void displayBuffer(char *Buffer, int length){
 void initialize() {
     nextSlaveIP = 0; //change this to localhost
     nextRID = MASTERRID;
+    
+    addSlave(
 }
 
 void addSlave(int slaveIP, int slaveSocketFD) {
-    //if (nextSlaveIP != localhost) {
-    //this needs to be changed once we figure out how to get localhost ip
-        char toSend[10];
-        toSend[0] = 13;
-        toSend[1] = 0x4A;
-        toSend[2] = 0x6F;
-        toSend[3] = 0x79;
-        toSend[4] = 0x21;
-        toSend[5] = (char) nextRID;
+    char toSend[10];
+    toSend[0] = 13;
+    toSend[1] = 0x4A;
+    toSend[2] = 0x6F;
+    toSend[3] = 0x79;
+    toSend[4] = 0x21;
+    toSend[5] = nextRID;
 
-        //i don't know for sure that this will work, it might need to be changed if nextSlaveIP changes
-        for (unsigned char i = 0; i < 4; i++) {
-            toSend[6 + i] = (char) ((nextSlaveIP >> (8 * (3 - i))) & 0xff);
-        }
-    //}
+    //i don't know for sure that this will work, it might need to be changed if nextSlaveIP changes format
+    for (unsigned char i = 0; i < 4; i++) {
+        toSend[6 + i] = (char) ((nextSlaveIP >> (8 * (3 - i))) & 0xff);
+    }
 
+    //this might need to be changed to UDP
     write(slaveSocketFD, toSend, sizeof(toSend));
 
-    theirRID++;
+    nextRID++;
     nextSlaveIP = slaveIP;
 }
