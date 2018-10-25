@@ -48,13 +48,11 @@ void *get_in_addr(struct sockaddr *sa)
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
-
-typedef struct RingNode
-{
-    int myRID;
-    int nextRID;
-    int nextSlaveIP;
-}RingNode;
+//
+//typedef struct RingNode
+//{
+//
+//}RingNode;
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +68,9 @@ int main(int argc, char *argv[])
 
     int numbytes;
     char buf[MAXDATASIZE];
+
+    int nextRID = 1;//this gets passed to slaves and incremented
+    int nextSlaveIP;//this just points to the next ip address in line
 
     //check for command line args with port number
     if (argc != 2)
@@ -184,4 +185,11 @@ void displayBuffer(char *Buffer, int length){
         printf("\n");
     }
     printf("\n\n");
+}
+
+void initialize() {
+
+}
+void addSlave(theirAddr) {
+
 }
